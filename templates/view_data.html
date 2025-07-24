@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}View Data - {{ filename }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-table me-2"></i>{{ filename }}
+    </h2>
+    <div class="btn-group">
+        <a href="{{ url_for('statistics', filename=filename) }}" class="btn btn-info">
+            <i class="fas fa-chart-bar me-1"></i>Statistics
+        </a>
+        <a href="{{ url_for('visualize', filename=filename) }}" class="btn btn-success">
+            <i class="fas fa-chart-pie me-1"></i>Visualize
+        </a>
+    </div>
+</div>
+
+<!-- Dataset Info -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-primary">{{ info.shape[0] }}</h5>
+                <p class="card-text">Rows</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-success">{{ info.shape[1] }}</h5>
+                <p class="card-text">Columns</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-warning">{{ info.null_counts.values() | sum }}</h5>
+                <p class="card-text">Missing Values</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-info">{{ info.columns | length }}</h5>
+                <p class="card-text">Features</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-table me-2"></i>Data Preview (First 100 rows)
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            {{ table_html | safe }}
+        </div>
+    </div>
+</div>
+
+<!-- Column Information -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-columns me-2"></i>Column Information
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Column Name</th>
+                        <th>Data Type</th>
+                        <th>Missing Values</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for column in info.columns %}
+                    <tr>
+                        <td><strong>{{ column }}</strong></td>
+                        <td>
+                            <span class="badge bg-secondary">{{ info.dtypes[column] }}</span>
+                        </td>
+                        <td>
+                            {% if info.null_counts[column] > 0 %}
+                                <span class="badge bg-warning">{{ info.null_counts[column] }}</span>
+                            {% else %}
+                                <span class="badge bg-success">0</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

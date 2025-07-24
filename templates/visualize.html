@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Visualize - {{ filename }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-chart-pie me-2"></i>Data Visualization - {{ filename }}
+    </h2>
+    <div class="btn-group">
+        <a href="{{ url_for('view_data', filename=filename) }}" class="btn btn-primary">
+            <i class="fas fa-table me-1"></i>View Data
+        </a>
+        <a href="{{ url_for('statistics', filename=filename) }}" class="btn btn-info">
+            <i class="fas fa-chart-bar me-1"></i>Statistics
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-cog me-2"></i>Chart Options
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="plotForm">
+                    <div class="mb-3">
+                        <label for="plotType" class="form-label">Chart Type</label>
+                        <select class="form-select" id="plotType" name="type">
+                            <option value="histogram">Histogram</option>
+                            <option value="bar">Bar Chart</option>
+                            <option value="pie">Pie Chart</option>
+                            <option value="line">Line Plot</option>
+                            <option value="scatter">Scatter Plot</option>
+                            <option value="boxplot">Box Plot</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="column1" class="form-label">Primary Column</label>
+                        <select class="form-select" id="column1" name="column">
+                            <option value="">Select Column</option>
+                            {% for col in numeric_cols %}
+                            <option value="{{ col }}">{{ col }} (Numeric)</option>
+                            {% endfor %}
+                            {% for col in categorical_cols %}
+                            <option value="{{ col }}">{{ col }} (Categorical)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3" id="column2Group" style="display: none;">
+                        <label for="column2" class="form-label">Secondary Column</label>
+                        <select class="form-select" id="column2" name="column2">
+                            <option value="">Select Column</option>
+                            {% for col in numeric_cols %}
+                            <option value="{{ col }}">{{ col }} (Numeric)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-chart-line me-2"></i>Generate Chart
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-image me-2"></i>Generated Chart
+                </h5>
+            </div>
+            <div class="card-body text-center" id="plotContainer">
+                <div class="text-muted py-5">
+                    <i class="fas fa-chart-line fa-3x mb-3"></i>
+                    <p>Select chart options and click "Generate Chart" to visualize your data</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('plotType').addEventListener('change', function() {
+    const column2Group = document.getElementById('column2Group');
+    if (this.value === 'scatter') {
+        column2Group.style.display = 'block';
+    } else {
+        column2Group.style.display = 'none';
+    }
+});
+
+document.getElementById('plotForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const params = new URLSearchParams();
+    
+    for (let [key, value] of formData.entries()) {
+        if (value) params.append(key, value);
+    }
+    
+    const plotContainer = document.getElementById('plotContainer');
+    plotContainer.innerHTML = '<div class="text-center py-5"><i class="fas fa-spinner fa-spin fa-2x"></i><p class="mt-2">Generating chart...</p></div>';
+    
+    fetch(`{{ url_for('generate_plot', filename=filename) }}?${params.toString()}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                plotContainer.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>${data.error}</div>`;
+            } else {
+                plotContainer.innerHTML = `<img src="data:image/png;base64,${data.plot}" class="img-fluid" alt="Generated Chart">`;
+            }
+        })
+        .catch(error => {
+            plotContainer.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Error generating chart: ${error}</div>`;
+        });
+});
+</script>
+{% endblock %}

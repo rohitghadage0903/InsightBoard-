@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Statistics - {{ filename }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-chart-bar me-2"></i>Statistical Analysis - {{ filename }}
+    </h2>
+    <div class="btn-group">
+        <a href="{{ url_for('view_data', filename=filename) }}" class="btn btn-primary">
+            <i class="fas fa-table me-1"></i>View Data
+        </a>
+        <a href="{{ url_for('visualize', filename=filename) }}" class="btn btn-success">
+            <i class="fas fa-chart-pie me-1"></i>Visualize
+        </a>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-primary">{{ additional_stats.total_rows }}</h5>
+                <p class="card-text">Total Rows</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-success">{{ additional_stats.total_columns }}</h5>
+                <p class="card-text">Total Columns</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-info">{{ additional_stats.numeric_columns }}</h5>
+                <p class="card-text">Numeric Columns</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-warning">{{ additional_stats.categorical_columns }}</h5>
+                <p class="card-text">Categorical</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-danger">{{ additional_stats.missing_values }}</h5>
+                <p class="card-text">Missing Values</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-secondary">{{ additional_stats.duplicate_rows }}</h5>
+                <p class="card-text">Duplicates</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Statistics -->
+{% if stats %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-calculator me-2"></i>Descriptive Statistics
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Statistic</th>
+                        {% for col in numeric_cols %}
+                        <th>{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in ['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'] %}
+                    <tr>
+                        <td><strong>{{ stat.title() }}</strong></td>
+                        {% for col in numeric_cols %}
+                        <td>
+                            {% if stats[col][stat] is defined %}
+                                {{ "%.2f"|format(stats[col][stat]) }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    No numeric columns found for statistical analysis.
+</div>
+{% endif %}
+{% endblock %}

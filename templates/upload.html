@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Data - Data Analytics Dashboard{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-upload me-2"></i>Upload Dataset
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" class="upload-form">
+                    <div class="mb-4">
+                        <label for="file" class="form-label">Choose Data File</label>
+                        <input type="file" class="form-control" id="file" name="file" 
+                               accept=".csv,.xlsx,.xls" required>
+                        <div class="form-text">
+                            Supported formats: CSV, Excel (.xlsx, .xls). Maximum file size: 16MB
+                        </div>
+                    </div>
+                    
+                    <div class="upload-area border-2 border-dashed rounded p-4 text-center mb-4">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                        <p class="mb-0">Drag and drop your file here or click to browse</p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-upload me-2"></i>Upload and Analyze
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Upload Guidelines
+                </h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Ensure your data has column headers in the first row
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Remove any merged cells or complex formatting
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        Use consistent data types within each column
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-check text-success me-2"></i>
+                        File size should be under 16MB for optimal performance
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Datasets - Data Analytics Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-database me-2"></i>Uploaded Datasets
+    </h2>
+    <a href="{{ url_for('upload_page') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Upload New Dataset
+    </a>
+</div>
+
+{% if dataset_files %}
+<div class="row">
+    {% for file in dataset_files %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card dataset-card h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-file-csv me-2 text-success"></i>
+                    {{ file.name }}
+                </h5>
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar me-1"></i>{{ file.modified }}<br>
+                        <i class="fas fa-weight me-1"></i>{{ "%.2f"|format(file.size / 1024) }} KB
+                    </small>
+                </p>
+                <div class="btn-group w-100">
+                    <a href="{{ url_for('view_data', filename=file.name) }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i>View
+                    </a>
+                    <a href="{{ url_for('statistics', filename=file.name) }}" class="btn btn-info btn-sm">
+                        <i class="fas fa-chart-bar me-1"></i>Stats
+                    </a>
+                    <a href="{{ url_for('visualize', filename=file.name) }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-chart-pie me-1"></i>Charts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-database fa-4x text-muted mb-4"></i>
+    <h4>No datasets uploaded yet</h4>
+    <p class="text-muted mb-4">Upload your first dataset to start analyzing data</p>
+    <a href="{{ url_for('upload_page') }}" class="btn btn-primary btn-lg">
+        <i class="fas fa-upload me-2"></i>Upload Dataset
+    </a>
+</div>
+{% endif %}
+{% endblock %}
